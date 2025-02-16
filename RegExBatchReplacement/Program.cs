@@ -6,21 +6,42 @@ namespace RegExBatchReplacement
 	{
 		static void Main(string[] args)
 		{
+			// Исходный текст, который будет обрабатываться регулярными выражениями
 			string Text = "1 Onee, 2 Two, 33 Throoee is good.";
-			IList<string> pattern = [ @"\d+", "ee", "oo" ];
-			IList<string> output = [ "Цифра", "ёBbb-т", "OOO-T" ];
 
-			if (pattern.Count == output.Count)
+			// Список пар (шаблон, замена), где шаблон — это регулярное выражение,
+			// а замена — строка, которой нужно заменить найденные совпадения.
+			IList<(string pattern, string output)> patterns = [
+				(@"\d+", "Цифра"), // Шаблон для поиска цифр и их замены на "Цифра"
+    				("ee", "ёBbb-т"),  // Замена последовательности "ee" на "ёBbb-т"
+    				("oo", "OOO-T")    // Замена последовательности "oo" на "OOO-T"
+			];
+
+			// Проверяем, есть ли хотя бы один шаблон в списке
+			if (patterns.Count > 0)
 			{
-				for (int i = 0; i < output.Count; i++)
+				// Проходим по каждому шаблону в списке
+				for (int i = 0; i < patterns.Count; i++)
 				{
-					var rx = new Regex(pattern[i], RegexOptions.Compiled | RegexOptions.IgnoreCase);
-					Text = rx.Replace(Text, output[i]);
+					// Создаем объект Regex с текущим шаблоном, 
+					// используя флаги Compiled и IgnoreCase
+					// - Compiled: предварительная компиляция шаблона 
+					// для улучшения производительности
+					// - IgnoreCase: игнорирование регистра при поиске совпадений
+					var rx = new Regex (patterns [i].pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+					// Выполняем замену всех совпадений в тексте на указанную замену
+					Text = rx.Replace (Text, patterns [i].output);
 				}
-				Console.WriteLine("Результат:\r\n" + Text);
+
+				// Выводим результат после всех замен
+				Console.WriteLine ("Результат:\r\n" + Text);
 			}
 			else
-				Console.WriteLine("Ошибка:\r\nКоличество pattern и замен не совпадает!");
+			{
+				// Если список шаблонов пустой, выводим сообщение об ошибке
+				Console.WriteLine ("Ошибка:\r\nКоличество pattern и замен не совпадает!");
+			}
 
 			Console.ReadKey();
 		}
